@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  email         String         @unique
+  password      String
+  role          Role           @default(PLAYER)
+  avatar        String?
+  teams         Team[]
+  tournaments   Tournament[] // ✅ Ajouté : relation inverse creator
+  registrations Registration[]
+  createdAt     DateTime       @default(now())
+}
+
+model Team {
+  id            Int            @id @default(autoincrement())
+  name          String
+  game          Game
+  captainId     Int
+  captain       User           @relation(fields: [captainId], references: [id])
+  players       Player[]
+  registrations Registration[]
+  rankings      Ranking[] // ✅ Ajouté : relation inverse ranking
+  createdAt     DateTime       @default(now())
+}
+
+model Player {
+  id     Int    @id @default(autoincrement())
+  name   String
+  teamId Int
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+}
+
+model Tournament {
+  id        Int              @id @default(autoincrement())
+  name      String
+  game      Game
+  prize     String
+  maxTeams  Int
+  format    BracketFormat    @default(SINGLE_ELIM)
+  status    TournamentStatus @default(REGISTERING)
+  creatorId Int
+  creator   User             @relation(fields: [creatorId], references: [id])
+  teams     Registration[]
+  matches   Match[]
+  rankings  Ranking[] // ✅ Ajouté : relation inverse ranking
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model Registration {
+  id           Int        @id @default(autoincrement())
+  teamId       Int
+  team         Team       @relation(fields: [teamId], references: [id])
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  seed         Int?
+  status       TeamStatus @default(CONFIRMED)
+  registeredAt DateTime   @default(now())
+  User         User?      @relation(fields: [userId], references: [id])
+  userId       Int?
+
+  @@unique([teamId, tournamentId])
+}
+
+model Match {
+  id           Int         @id @default(autoincrement())
+  tournamentId Int
+  tournament   Tournament  @relation(fields: [tournamentId], references: [id])
+  round        Int
+  matchNumber  Int
+  team1Id      Int
+  team2Id      Int
+  team1Score   Int?        @default(0)
+  team2Score   Int?        @default(0)
+  winnerTeamId Int?
+  status       MatchStatus @default(SCHEDULED)
+  scheduledAt  DateTime?
+  playedAt     DateTime?
+
+  @@unique([tournamentId, round, matchNumber])
+}
+
+model Ranking {
+  id           Int      @id @default(autoincrement())
+  tournamentId Int
+  teamId       Int
+  position     Int
+  points       Int      @default(0)
+  wins         Int      @default(0)
+  losses       Int      @default(0)
+  updatedAt    DateTime @updatedAt
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  team       Team       @relation(fields: [teamId], references: [id])
+
+  @@unique([tournamentId, teamId])
+}
+
+enum Role {
+  PLAYER
+  ADMIN
+  ORGANIZER
+}
+
+enum Game {
+  MLBB
+  PUBG
+}
+
+enum BracketFormat {
+  SINGLE_ELIM
+  DOUBLE_ELIM
+  ROUND_ROBIN
+}
+
+enum TournamentStatus {
+  REGISTERING
+  CHECKIN
+  ACTIVE
+  FINISHED
+}
+
+enum TeamStatus {
+  PENDING
+  CONFIRMED
+  DISQUALIFIED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+  FORFEIT
+}
