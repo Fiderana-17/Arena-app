@@ -33,3 +33,33 @@ export const getMyTeams = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getTeamMembers = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+
+    const team = await prisma.team.findUnique({
+      where: { id: Number(teamId) },
+      include: {
+        captain: {
+          select: { id: true, username: true, email: true, role: true }
+        },
+        players: true
+      }
+    });
+
+    if (!team) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    res.json({
+      id: team.id,
+      name: team.name,
+      game: team.game,
+      captain: team.captain,
+      players: team.players
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
