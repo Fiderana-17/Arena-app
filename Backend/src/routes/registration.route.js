@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerTeamToTournament, getTournamentRegistrations } from '../controllers/registrationController.js';
+import { registerTeamToTournament, getTournamentRegistrations } from '../controllers/registration.controller.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
