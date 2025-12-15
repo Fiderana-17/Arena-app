@@ -18,6 +18,7 @@ model User {
   tournaments   Tournament[] // ✅ Ajouté : relation inverse creator
   registrations Registration[]
   createdAt     DateTime       @default(now())
+  Player        Player[]
 }
 
 model Team {
@@ -37,6 +38,8 @@ model Player {
   name   String
   teamId Int
   team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId Int?
+  user   User?  @relation(fields: [userId], references: [id])
 }
 
 model Tournament {
