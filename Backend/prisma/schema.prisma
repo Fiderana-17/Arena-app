@@ -117,6 +117,12 @@ enum Role {
 enum Game {
   MLBB
   PUBG
+  LOL
+  CSGO
+  VALORANT
+  FORTNITE
+  APEX_LEGENDS
+  OVERWATCH
 }
 
 enum BracketFormat {
