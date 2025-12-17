@@ -30,6 +30,8 @@ model Team {
   players       Player[]
   registrations Registration[]
   rankings      Ranking[] // ✅ Ajouté : relation inverse ranking
+  matchesAsTeam1 Match[] @relation("MatchTeam1")
+  matchesAsTeam2 Match[] @relation("MatchTeam2")
   createdAt     DateTime       @default(now())
 }
 
@@ -82,6 +84,8 @@ model Match {
   matchNumber  Int
   team1Id      Int
   team2Id      Int
+  team1        Team        @relation("MatchTeam1", fields: [team1Id], references: [id])
+  team2        Team        @relation("MatchTeam2", fields: [team2Id], references: [id])
   team1Score   Int?        @default(0)
   team2Score   Int?        @default(0)
   winnerTeamId Int?
