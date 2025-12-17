@@ -5,6 +5,8 @@ import authRoutes from './routes/auth.route.js';
 import tournamentRoutes from './routes/tournaments.route.js';
 import teamRoutes from './routes/teams.route.js';
 import registrationRoutes from './routes/registration.route.js';
+import matchRoutes from './routes/match.route.js';
+import playerRoutes from './routes/players.route.js';
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tournaments', tournamentRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/registrations', registrationRoutes);
+app.use('/api/matches', matchRoutes);
+app.use('/api/players', playerRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
