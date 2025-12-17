@@ -4,7 +4,7 @@ import { prisma } from '../prisma/index.js';
 
 export const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, role } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
@@ -12,6 +12,7 @@ export const register = async (req, res) => {
         username,
         email,
         password: hashedPassword,
+        role: role || 'PLAYER',
       },
     });
 
